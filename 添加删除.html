@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="lib/bootstrap-3.3.7.css">
+</head>
+
+<body>
+    <div id="app">
+
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">添加品牌</h3>
+            </div>
+            <div class="panel-body">
+                <label for="">ID: <input type="text" v-model='id'></label>
+                <label for="">name: <input type="text"  v-model='name' @keydown.f2  = 'add' v-focus v-color = "'red'" ></label>
+                <input type="button" value="添加" class="btn btn-primary" @click = 'add' >
+                <!-- 搜索 -->
+                搜索关键字：<input type="text" v-model='keywards'>
+            </div>
+        </div>
+
+        <!-- bs3-table -->
+        <table class="table table-condensed table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                    <th>ctime</th>
+                    <th>
+                        <a href="#">操作</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for='(value,index) in search(keywards)'>
+                    <td>{{value.id}}</td>
+                    <td v-color1="'green'">{{value.name}}</td>
+                    <td>{{value.ctime | dateFormet}}</td>
+                    <td><a href="#" @click='del(index)'>delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</body>
+<script src="lib/vue-2.4.0.js"></script>
+<script>
+    // 配置键盘
+    Vue.config.keyCodes.f2 = 113
+
+    // 更改时间样式
+    Vue.filter('dateFormet',function(data){
+        var time = new Date();
+        var y = (time.getFullYear()).toString().padStart(2,0);
+        var m = (time.getMonth()+1).toString().padStart(2,0);
+        var d = (time.getDate()).toString().padStart(2,0);
+
+        var hh = (time.getHours()).toString().padStart(2,0);
+        var mm = (time.getMinutes()).toString().padStart(2,0);
+        var ss = (time.getSeconds()).toString().padStart(2,0);
+        return `${y}-${m}-${d}  ${hh}:${mm}:${ss}`
+    
+        // 补零操作 ES6 String.prototype.padStart(maxlength,fillString) maxlength 填充的长度  fillString要填充的内容
+    })
+    // 自定义指令
+    Vue.directive('focus',{
+        bind:function(el,binding){
+            el.focus();
+        },
+        inserted:function(el,mbinding){
+            el.focus();
+        },
+        update:function(el){}
+    })
+
+    Vue.directive('color',{
+        bind:function(el,binding){
+            el.style.color = binding.value;
+        },
+        instred:function(elmbinding){
+            
+        },
+        update:function(el){}
+    })
+
+    var app = new Vue({
+            
+        el: '#app',
+        data: {
+            id : '',
+            name : '',
+            ctime : '',
+            keywards:'',
+            list: [
+                { id: 1, name: '张三', ctime: new Date() },
+                { id: 2, name: '李四', ctime: new Date() },
+                { id: 3, name: '王五', ctime: new Date() },
+            ]
+        },
+        methods: {
+            add(){
+                this.list.push({id:this.id,name:this.name,ctime:new Date()})
+            },
+            del(index){
+                // for (let i =0; i<this.list.length;i++){
+                //     if(i==index){
+                //         this.list.splice(i,1);
+                //     }
+                // }
+                this.list.some((item,i) => {
+                    if(i == index ){
+                        this.list.splice(index,1)
+                    }
+                })
+            },
+            search(keywards){
+                return this.list.filter(item=>{
+                    if(item.name.includes(keywards)){
+                        return item
+                    }
+                })
+            }
+            
+        },
+        directives:{
+            'color1':{
+                bind:function(el,binding){
+                    el.style.color = binding.value
+                }
+            }
+            // 下面是简写方式
+            // color1:function(el,binding){
+            //     el.style.color = binding.value
+        }
+        
+    })
+</script>
+
+</html>
